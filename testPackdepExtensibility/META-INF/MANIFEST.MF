@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: TestPackdepExtensibility
+Bundle-SymbolicName: testPackdepExtensibility;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Require-Bundle: pa.iscde.packdep,
+ org.eclipse.zest.core;bundle-version="1.5.201",
+ org.eclipse.zest.layouts;bundle-version="1.1.200"
