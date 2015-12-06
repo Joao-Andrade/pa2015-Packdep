@@ -36,6 +36,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.zest.core.widgets.Graph;
 import org.eclipse.zest.core.widgets.GraphConnection;
+import org.eclipse.zest.core.widgets.GraphItem;
 import org.eclipse.zest.core.widgets.GraphNode;
 import org.eclipse.zest.core.widgets.ZestStyles;
 import org.eclipse.zest.layouts.LayoutStyles;
@@ -70,8 +71,17 @@ public class View implements PidescoView {
 	Font highlightedFont;
 	Image icon;
 	Color backgroundColor;
+	int connectionStyle;
 	
+	
+	//graph
+	Graph g;
+	
+	//package selected
 	GraphNode packSelected;
+	
+	//all packages
+	ArrayList<PackageElement> packages;
 	
 	//----Viewer----
 	
@@ -86,13 +96,17 @@ public class View implements PidescoView {
 		getLayoutExtensionInfo(imageMap);
 		
 		// all packages
-		ArrayList<PackageElement> packages = getAllPackages(projectService);
+		packages = getAllPackages(projectService);
 		
 		//dependencies
 		Multimap<PackageElement, PackageElement> dependencies = getDependencies(packages);
 		
 		//show graph of packages
 		showPackDep(viewArea, imageMap, packages, dependencies);
+		
+		
+		//possivel forma de extensao do deepsearch
+		searched("package1");
 	}
 	
 	//get data from the plug in that uses this extension point
@@ -116,44 +130,48 @@ public class View implements PidescoView {
 				highlightedFont = layoutExtension.highlightedFont();
 				icon =layoutExtension.icon();
 				backgroundColor = layoutExtension.backgroundColor();
+				connectionStyle = layoutExtension.connectionStyle();
 				
 				//verify parameters
 				//if some is not well defined, the default value is applied.
 				if(packageSizeHeight <= 0){
-					packageSizeHeight = 30;
+					packageSizeHeight = 50;
 				}
 				if(packageSizeWidth <= 0){
 					packageSizeWidth = 100;
 				}
 				if(packageBackgroundColor == null){
-					packageBackgroundColor = new Color(Display.getDefault(), 0, 0, 200);
+					packageBackgroundColor = new Color(Display.getDefault(), 255, 134, 59);
 				}
 				if(packageForegroundColor == null){
 					packageForegroundColor = new Color(Display.getDefault(), 255, 255, 255);
 				}
 				if(packageFont == null){
-					packageFont = new Font(Display.getCurrent(), "style", 8, 0);
+					packageFont = new Font(Display.getDefault(), "style", 10, 3);
 				}
 				if(highlightedSizeHeight <= 0){
-					highlightedSizeHeight = 30;
+					highlightedSizeHeight = 50;
 				}
 				if(highlightedSizeWidth <= 0){
 					highlightedSizeWidth = 100;
 				}
 				if(highlightedBackgroundColor == null){
-					highlightedBackgroundColor = new Color(Display.getDefault(), 0, 0, 0);
+					highlightedBackgroundColor = new Color(Display.getDefault(), 255, 11, 0);
 				}
 				if(highlightedForegroundColor == null){
 					highlightedForegroundColor = new Color(Display.getDefault(), 255, 255, 255);
 				}
 				if(highlightedFont == null){
-					highlightedFont = new Font(Display.getDefault(), "style", 8, 1);
+					highlightedFont = new Font(Display.getDefault(), "style", 10, 3);
 				}
 				if(icon == null){
 					icon = imageMap.get("icon.png");
 				}
 				if(backgroundColor == null){
 					backgroundColor = new Color(Display.getDefault(), 255, 255, 255);
+				}
+				if(connectionStyle < 0){
+					connectionStyle = ZestStyles.CONNECTIONS_DIRECTED;
 				}
 			} catch (Exception e) {
 				System.err.println("nao deu.");
@@ -293,15 +311,21 @@ public class View implements PidescoView {
 		//layout
 		viewArea.setLayout(new FillLayout());
 		//set Graph
-		Graph g = new Graph(viewArea, SWT.NONE);
+		g = new Graph(viewArea, SWT.NONE);
 		g.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				//set node selected style properties.
-				GraphNode selected = (GraphNode)((Graph) e.widget).getSelection().get(0);
-				packSelected(selected);
+				try{
+					GraphNode selected = (GraphNode)((Graph) e.widget).getSelection().get(0);
+					newPackSelected(selected);
+				}
+				catch(IndexOutOfBoundsException ioobe){
+					newPackSelected(null);
+				}
+				
 			}
 		});
-		g.setConnectionStyle(ZestStyles.CONNECTIONS_DIRECTED);
+		g.setConnectionStyle(connectionStyle);
 		g.setBackground(backgroundColor);
 		//packages.
 		//Map each GraphNode to the respective package as long as they have a connection in the dependencies
@@ -332,17 +356,67 @@ public class View implements PidescoView {
 	}
 	
 	//Node selected style properties.
-	private void packSelected(GraphNode selected){
+	private void newPackSelected(GraphNode selected){
 		//undo previous selected node style properties.
 		if(packSelected != null){
 			packSelected.setSize(packageSizeWidth, packageSizeHeight);
 			packSelected.setForegroundColor(packageForegroundColor);
 			packSelected.setFont(packageFont);
 		}
-		//apply highlighted properties to the selected node.
-		selected.setSize(highlightedSizeWidth, highlightedSizeHeight);
-		selected.setForegroundColor(highlightedForegroundColor);
-		selected.setFont(highlightedFont);
-		packSelected = selected;
+		if(selected != null){
+			//apply highlighted properties to the selected node.
+			selected.setSize(highlightedSizeWidth, highlightedSizeHeight);
+			selected.setForegroundColor(highlightedForegroundColor);
+			selected.setFont(highlightedFont);
+			packSelected = selected;
+		}
+	}
+	
+	
+	
+	
+	//--Extensions--
+	
+	//DeepSearch
+	//supostamente deve dar o texto do resultado. Ou um array dos resultados....
+	public void searched(String word){
+		for (PackageElement p : packages) {
+			if(p.getName().equals(word)){
+				selectPackage(p);
+				return;
+			}
+			else if(p.hasChildren()){
+				SortedSet<SourceElement> c = p.getChildren();
+				//check if child is a class
+				for(SourceElement e : c){
+					if(e.isClass()){
+						//remove ".java"
+						String name = (String)e.getName().subSequence(0, e.getName().length()-5);
+						if(name.equals(word)){
+							selectPackage(p);
+							return;
+						}
+					}
+				}
+			}
+		}
+		//if searched word is not a package or class
+		selectPackage(null);
+	}
+	
+	private void selectPackage(PackageElement p){
+		//if searched word is not a package or class
+		if(p == null){
+			g.setSelection(new GraphItem[]{});
+			return;
+		}
+		//else select the currespondent node
+		List<GraphNode> nodes = (List<GraphNode>)g.getNodes();
+		for (GraphNode n : nodes) {
+			if(p.getName().equals(n.getText())){
+				g.setSelection(new GraphItem[]{(GraphItem)n});
+				newPackSelected(n);
+			}
+		}
 	}
 }

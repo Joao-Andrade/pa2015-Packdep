@@ -4,6 +4,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.zest.core.widgets.ZestStyles;
 
 /**
  * Set up the graphical elements in the package dependencies view.
@@ -103,4 +104,11 @@ public interface packdepStyle {
 	 * @return view background color.
 	 */
 	Color backgroundColor();
+	
+	/**
+	 * Implementation example:
+	 * return ZestStyles.CONNECTIONS_DIRECTED
+	 * @return style of the connections of the dependencies.
+	 */
+	int connectionStyle();
 }
