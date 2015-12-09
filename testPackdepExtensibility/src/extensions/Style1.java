@@ -4,74 +4,76 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.zest.core.widgets.ZestStyles;
 
 import pa.iscde.packdep.extensions.packdepStyle;
+import pa.iscde.packdep.info.GlobalInfo;
+import pa.iscde.packdep.info.PackageInfo;
+import pa.iscde.packdep.info.PackageSize;
 
-public class Style1 implements packdepStyle {
-	@Override
-	public int packageSizeHeight() {
-		return 30;
-	}
+public class Style1 implements packdepStyle{
+
+	int nClasses;
+	
 	
 	@Override
-	public int packageSizeWidth() {
-		return 100;
+	public void init(GlobalInfo gInfo) {
+		nClasses = gInfo.getnClasses();
 	}
 
 	@Override
-	public Color packageBackgroundColor() {
+	public Color getColor(PackageInfo info) {
+		if(info.getnClass()==0){
+			return new Color(Display.getDefault(), 200, 0, 0);
+		}
+		else if(info.getnClass()<2){
+			return new Color(Display.getDefault(), 200, 200, 0);
+		}
+		else{
+			return new Color(Display.getDefault(), 0, 200, 0);
+		}
+	}
+
+	@Override
+	public Color getTextColor(PackageInfo info) {
+		return new Color(Display.getDefault(), 255, 255, 255);
+	}
+
+	@Override
+	public Color getHighlightColor(PackageInfo info) {
 		return new Color(Display.getDefault(), 0, 0, 200);
 	}
 
 	@Override
-	public Color packageForegroundColor() {
-		return new Color(Display.getDefault(), 255, 255, 255);
-	}
-
-	@Override
-	public Font packageFont() {
-		return new Font(Display.getCurrent(), "style", 8, 0);
-	}
-
-	@Override
-	public int highlightedSizeHeight() {
-		return 30;
-	}
-	
-	@Override
-	public int highlightedSizeWidth(){
-		return 100;
-	}
-
-	@Override
-	public Color highlightedBackgroundColor() {
+	public Color getBorderColor(PackageInfo info) {
 		return new Color(Display.getDefault(), 0, 0, 0);
 	}
 
 	@Override
-	public Color highlightedForegroundColor() {
-		return new Color(Display.getDefault(), 255, 255, 255);
+	public Color getBorderHighlightColor(PackageInfo info) {
+		return new Color(Display.getDefault(), 0, 0, 0);
 	}
 
 	@Override
-	public Font highlightedFont() {
-		return new Font(Display.getDefault(), "style", 8, 1);
+	public PackageSize getSize(PackageInfo info) {
+		PackageSize size = new PackageSize(100,50);
+		return size;
 	}
 
 	@Override
-	public Image icon() {
+	public Font getTextFont(PackageInfo info) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Color backgroundColor() {
-		return new Color(Display.getDefault(), 255, 255, 255);
+	public Color getBackgroundColor(PackageInfo info) {
+		// TODO Auto-generated method stub
+		return null;
 	}
-	
+
 	@Override
-	public int connectionStyle(){
-		return ZestStyles.CONNECTIONS_DIRECTED;
+	public Image getIcon(PackageInfo info) {
+		return null;
 	}
+
 }

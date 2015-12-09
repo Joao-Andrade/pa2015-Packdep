@@ -14,4 +14,5 @@ Require-Bundle: org.eclipse.core.runtime,
  com.google.guava;bundle-version="15.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
-Export-Package: pa.iscde.packdep.extensions
+Export-Package: pa.iscde.packdep.extensions,
+ pa.iscde.packdep.info
