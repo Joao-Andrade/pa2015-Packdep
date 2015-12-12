@@ -24,7 +24,12 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -33,6 +38,8 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.zest.core.widgets.Graph;
@@ -51,6 +58,7 @@ import pa.iscde.packdep.extensions.packdepStyle;
 import pa.iscde.packdep.info.GlobalInfo;
 import pa.iscde.packdep.info.PackageInfo;
 import pa.iscde.packdep.info.PackageSize;
+import pa.iscde.packdep.info.PackageStyleInfo;
 import pt.iscte.pidesco.extensibility.PidescoView;
 import pt.iscte.pidesco.javaeditor.service.JavaEditorListener;
 import pt.iscte.pidesco.javaeditor.service.JavaEditorServices;
@@ -69,9 +77,17 @@ public class View implements PidescoView {
 	//all packages
 	ArrayList<PackageElement> packages;
 	
+	//all styles. From the extensions.
+	ArrayList<ArrayList<PackageStyleInfo>> styles;
+	
+	//Graph
+	Graph g;
+	
+	//Graph Nodes
+	ArrayList<GraphNode> nodes;
+	
 	//array with all Packages information
 	ArrayList<PackageInfo> pInfo;
-	//infos.add(packageInformation((PackageElement) e));
 	
 	//global information
 	GlobalInfo gInfo;
@@ -85,6 +101,7 @@ public class View implements PidescoView {
 	public void createContents(Composite viewArea, Map<String, Image> imageMap) {
 		
 		packages = new ArrayList<PackageElement>();
+		styles = new ArrayList<ArrayList<PackageStyleInfo>>();
 		
 		// services
 		editorService = Activator.getEditorService();
@@ -100,9 +117,10 @@ public class View implements PidescoView {
 		//testPrintInformation();
 		
 		showGraph(viewArea, imageMap);
+
 		
 	}
-
+	
 	private ArrayList<PackageInfo> getPackages(){
 		ArrayList<PackageInfo> infos = new ArrayList<PackageInfo>();
 		
@@ -245,106 +263,98 @@ public class View implements PidescoView {
 		//List of graphs
 		//Each extension has a different graph
 		//set Graph
-		Graph g = new Graph(viewArea, SWT.NONE);
+		g = new Graph(viewArea, SWT.NONE);
 		g.setConnectionStyle(ZestStyles.CONNECTIONS_DIRECTED);
 		
 		Map<PackageElement, GraphNode> graphNodes = new HashMap<PackageElement, GraphNode>();
+		nodes = new ArrayList<GraphNode>();
+		//Default Style
+		ArrayList<PackageStyleInfo> styleArray = new ArrayList<PackageStyleInfo>();
+		for(PackageInfo p : pInfo){
+			Image icon = imageMap.get("p2.png");
+			Color packageColor = new Color(Display.getDefault(), 255, 134, 59);
+			Color letterColor = new Color(Display.getDefault(), 255, 255, 255);
+			Color highlightColor = new Color(Display.getDefault(), 255, 11, 0);
+			Color borderColor = new Color(Display.getDefault(), 0, 0, 0);
+			Color borderHighlightColor = new Color(Display.getDefault(), 0, 0, 0);
+			Color backgroundColor = new Color(Display.getDefault(), 255, 255, 255);
+			Font letterFont = new Font(Display.getDefault(), "style", 8, 3);
+			GraphNode n = new GraphNode(g, SWT.NONE, p.getName(), icon);
+			n.setBackgroundColor(packageColor);
+			n.setForegroundColor(letterColor);
+			n.setHighlightColor(highlightColor);
+			n.setFont(letterFont);
+			n.setBorderColor(borderColor);
+			n.setBorderHighlightColor(borderHighlightColor);
+			g.setBackground(backgroundColor);
+			System.out.println("Name " + p.getName());
+			PackageSize size = new PackageSize(n.getSize().width, n.getSize().height);
+			n.setSize(size.getWidth(), size.getHeight());
+			nodes.add(n);
+			graphNodes.put(p.getElement(), n);
+			PackageStyleInfo style1 = new PackageStyleInfo("default style", packageColor, letterColor, highlightColor, borderColor, borderHighlightColor, size, letterFont, backgroundColor, icon);
+			styleArray.add(style1);
+		}
+		styles.add(styleArray);
 		
 		IExtensionRegistry reg = Platform.getExtensionRegistry();
 		IConfigurationElement[] extensions = reg.getConfigurationElementsFor("pa.iscde.packdep.packdepStyleCreator");
-		//if there are no extensions
-		if(extensions.length == 0){
-			for(PackageInfo p : pInfo){
-				GraphNode n = new GraphNode(g, SWT.NONE, p.getName(), imageMap.get("p2.png"));
-				n.setBackgroundColor(new Color(Display.getDefault(), 255, 134, 59));
-				n.setForegroundColor(new Color(Display.getDefault(), 255, 255, 255));
-				n.setHighlightColor(new Color(Display.getDefault(), 255, 11, 0));
-				n.setFont(new Font(Display.getDefault(), "style", 8, 3));
-				n.setBorderColor(new Color(Display.getDefault(), 0, 0, 0));
-				n.setBorderHighlightColor(new Color(Display.getDefault(), 0, 0, 0));
-				g.setBackground(new Color(Display.getDefault(), 255, 255, 255));
-				graphNodes.put(p.getElement(), n);
-			}
-		}
 		//if there's extensions
-		else{
-			for (int i = 0; i < extensions.length; i++) {
-				IConfigurationElement element = extensions[i];
-				try {
-					//get parameters
-					packdepStyle e = (packdepStyle) element.createExecutableExtension("class");
-					for(PackageInfo p : pInfo){
-						e.init(gInfo);
-						Image icon = e.getIcon(p);
-						Color packageColor = e.getColor(p);
-						Color letterColor = e.getTextColor(p);
-						Color highlightColor = e.getHighlightColor(p);
-						Color borderColor = e.getBorderColor(p);
-						Color borderHighlightColor = e.getBorderHighlightColor(p);
-						Color backgroundColor = e.getBackgroundColor(p);
-						Font letterFont = e.getTextFont(p);
-						PackageSize size = e.getSize(p);
-						//check if extensions has everything completed or if has methods that return null.
-						//if null, a default value is used.
-						GraphNode n;
-						if(icon == null){
-							n = new GraphNode(g, SWT.NONE, p.getName(), imageMap.get("p2.png"));
-						}
-						else{
-							n = new GraphNode(g, SWT.NONE, p.getName(), e.getIcon(p));
-						}
-						if(packageColor != null){
-							n.setBackgroundColor(packageColor);
-						}
-						else{
-							n.setBackgroundColor(new Color(Display.getDefault(), 255, 134, 59));
-						}
-						if(letterColor != null){
-							n.setForegroundColor(letterColor);
-						}
-						else{
-							n.setForegroundColor(new Color(Display.getDefault(), 255, 255, 255));
-						}
-						if(highlightColor != null){
-							n.setHighlightColor(highlightColor);
-						}
-						else{
-							n.setHighlightColor(new Color(Display.getDefault(), 255, 11, 0));
-						}
-						if(letterFont != null){
-							n.setFont(letterFont);
-						}
-						else{
-							n.setFont(new Font(Display.getDefault(), "style", 8, 3));
-						}
-						if(borderColor != null){
-							n.setBorderColor(borderColor);
-						}
-						else{
-							n.setBorderColor(new Color(Display.getDefault(), 0, 0, 0));
-						}
-						if(borderHighlightColor != null){
-							n.setBorderHighlightColor(borderHighlightColor);
-						}
-						else{
-							n.setBorderHighlightColor(new Color(Display.getDefault(), 0, 0, 0));
-						}
-						if(backgroundColor != null){
-							g.setBackground(backgroundColor);
-						}
-						else{
-							g.setBackground(new Color(Display.getDefault(), 255, 255, 255));
-						}
-						//size does not have a default size because it adjusts without a parameter.
-						if(size != null){
-							n.setSize(size.getWidth(), size.getHeight());
-						}
-						
-						graphNodes.put(p.getElement(), n);
+		for (int i = 0; i < extensions.length; i++) {
+			//new style
+			styleArray = new ArrayList<PackageStyleInfo>();
+			IConfigurationElement element = extensions[i];
+			try {
+				//get parameters
+				packdepStyle e = (packdepStyle) element.createExecutableExtension("class");
+				int number = 0;
+				for(PackageInfo p : pInfo){
+					e.init(gInfo);
+					Image icon = e.getIcon(p);
+					Color packageColor = e.getColor(p);
+					Color letterColor = e.getTextColor(p);
+					Color highlightColor = e.getHighlightColor(p);
+					Color borderColor = e.getBorderColor(p);
+					Color borderHighlightColor = e.getBorderHighlightColor(p);
+					Color backgroundColor = e.getBackgroundColor(p);
+					Font letterFont = e.getTextFont(p);
+					PackageSize size = e.getSize(p);
+					//check if extensions has everything completed or if has methods that return null.
+					//if null, a default value is used.
+					if(icon == null){
+						icon = imageMap.get("p2.png");
 					}
+					if(packageColor == null){
+						packageColor = new Color(Display.getDefault(), 255, 134, 59);
+					}
+					if(letterColor == null){
+						letterColor = new Color(Display.getDefault(), 255, 255, 255);
+					}
+					if(highlightColor == null){
+						highlightColor = new Color(Display.getDefault(), 255, 11, 0);
+					}
+					if(letterFont == null){
+						letterFont = new Font(Display.getDefault(), "style", 8, 3);
+					}
+					if(borderColor == null){
+						borderColor = new Color(Display.getDefault(), 0, 0, 0);
+					}
+					if(borderHighlightColor == null){
+						borderHighlightColor = new Color(Display.getDefault(), 0, 0, 0);
+					}
+					if(backgroundColor == null){
+						backgroundColor = new Color(Display.getDefault(), 255, 255, 255);
+					}
+					if(size == null){
+						size = styles.get(0).get(number).getSize();
+					}
+					number = number + 1;
+					PackageStyleInfo style1 = new PackageStyleInfo(element.getAttribute("name"), packageColor, letterColor, highlightColor, borderColor, borderHighlightColor, size, letterFont, backgroundColor, icon);
+					styleArray.add(style1);
 				}
-				catch(Exception e){}
 			}
+			catch(Exception e){}
+			styles.add(styleArray);
 		}
 		
 		//connections. Dependencies.
@@ -357,17 +367,92 @@ public class View implements PidescoView {
 			}
 		}
 		
-		/*for (PackageElement key : map.keySet()) {
-		     Collection<PackageElement> values = map.get(key);
-		     for (PackageElement p: values){
-		    	 new GraphConnection(g, SWT.NONE, graph.get(key), graph.get(p));
-		     }
-		   }*/
-		
 		g.setLayoutAlgorithm(new SpringLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
+		
+		popUpExample();
 	}
 	
+	
+	private void popUpExample(){
+		
+		//Os comentarios disto estao em portugues. Depois apaga isto.
+		//Ou altera como quiseres desde que os comentarios
+		//fiquem todos iguais. Em ingles. Ou entao mudasse tudo para portugues.
 
+		//pode ser final porque a variavel não vai mudar.
+		final Menu menu = new Menu(g);
+		//item 1
+	    MenuItem subMenuStyles = new MenuItem(menu, SWT.CASCADE);
+	    subMenuStyles.setText("Styles");
+
+	    //o acontece quando clicas no item 1
+	    subMenuStyles.addSelectionListener(new SelectionAdapter() {
+	      public void widgetSelected(SelectionEvent e) {
+	        System.out.println("Styles");
+	      }
+	    });
+	    
+	    Menu menuStyles = new Menu(menu);
+	    for(int i = 0; i< styles.size(); i++){
+	    	final int numberStyle = i;
+	    	MenuItem style1 = new MenuItem(menuStyles, SWT.CASCADE);
+		    style1.setText(styles.get(i).get(0).getName());
+
+		    //o acontece quando clicas no item 1
+		    style1.addSelectionListener(new SelectionAdapter() {
+		      public void widgetSelected(SelectionEvent e) {
+		        changeStyle(numberStyle);
+		      }
+		    });
+	    }
+	    
+	    subMenuStyles.setMenu(menuStyles);
+	    
+	    
+	    
+	    
+	    
+	    //colocar menu no grafico
+	    g.setMenu(menu);
+	    
+	    //botao direito chama o menu
+	    g.addMouseListener(new MouseListener(){
+	    	@Override
+	    	public void mouseDoubleClick(MouseEvent e) {
+			}
+
+			@Override
+			public void mouseDown(MouseEvent e) {
+				//botao direito
+				if(e.button == 2){
+					menu.setVisible(true);
+				}
+			}
+
+			@Override
+			public void mouseUp(MouseEvent e) {
+			}
+	    });
+	}
+
+	private void changeStyle(int style){
+		int i = 0;
+		if(!nodes.isEmpty()){
+			for(GraphNode n : nodes){
+				PackageStyleInfo p = styles.get(style).get(i);
+				n.setBackgroundColor(p.getColor());
+				n.setForegroundColor(p.getTextColor());
+				n.setHighlightColor(p.getHighlightColor());
+				n.setBorderColor(p.getBorderColor());
+				n.setBorderHighlightColor(p.getBorderHighlightColor());
+				n.setFont(p.getTextFont());
+				n.setImage(p.getIcon());
+				n.setSize(p.getSize().getWidth(), p.getSize().getHeight());
+				g.setBackground(p.getBackgroundColor());
+				i++;
+			}
+		}
+	}
 	
 	private void testPrintInformation() {
 		System.out.println("Packages information:");

@@ -8,5 +8,19 @@
             name="style">
       </creator>
    </extension>
+   <extension
+         point="pa.iscde.packdep.packdepStyleCreator">
+      <creator
+            class="extensions.Style2"
+            name="style2">
+      </creator>
+   </extension>
+   <extension
+         point="pa.iscde.packdep.packdepStyleCreator">
+      <creator
+            class="extensions.Style3"
+            name="style 3">
+      </creator>
+   </extension>
 
 </plugin>

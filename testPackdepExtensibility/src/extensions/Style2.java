@@ -10,7 +10,7 @@ import pa.iscde.packdep.info.GlobalInfo;
 import pa.iscde.packdep.info.PackageInfo;
 import pa.iscde.packdep.info.PackageSize;
 
-public class Style1 implements packdepStyle{
+public class Style2 implements packdepStyle{
 
 	int nClasses;
 	
@@ -23,9 +23,9 @@ public class Style1 implements packdepStyle{
 	@Override
 	public Color getColor(PackageInfo info) {
 		if(info.getnClass()==0){
-			return new Color(Display.getDefault(), 200, 0, 0);
+			return new Color(Display.getDefault(), 200, 200, 200);
 		}
-		else if(info.getnClass()==1){
+		else if(info.getnClass()<2){
 			return new Color(Display.getDefault(), 200, 200, 0);
 		}
 		else{
@@ -40,7 +40,7 @@ public class Style1 implements packdepStyle{
 
 	@Override
 	public Color getHighlightColor(PackageInfo info) {
-		return new Color(Display.getDefault(), 0, 0, 200);
+		return new Color(Display.getDefault(), 200, 0, 200);
 	}
 
 	@Override

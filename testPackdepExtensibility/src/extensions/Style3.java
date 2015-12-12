@@ -10,69 +10,72 @@ import pa.iscde.packdep.info.GlobalInfo;
 import pa.iscde.packdep.info.PackageInfo;
 import pa.iscde.packdep.info.PackageSize;
 
-public class Style1 implements packdepStyle{
+public class Style3 implements packdepStyle {
 
-	int nClasses;
-	
-	
 	@Override
 	public void init(GlobalInfo gInfo) {
-		nClasses = gInfo.getnClasses();
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
 	public Color getColor(PackageInfo info) {
-		if(info.getnClass()==0){
-			return new Color(Display.getDefault(), 200, 0, 0);
-		}
-		else if(info.getnClass()==1){
-			return new Color(Display.getDefault(), 200, 200, 0);
+		Color c;
+		System.out.println(info.getnDependencies() + " " + info.getName());
+		if(info.getnDependencies()<=0){
+			c = new Color(Display.getDefault(), 0, 0, 200);
 		}
 		else{
-			return new Color(Display.getDefault(), 0, 200, 0);
+			c = new Color(Display.getDefault(), 200, 0, 0);
 		}
+		return c;
 	}
 
 	@Override
 	public Color getTextColor(PackageInfo info) {
-		return new Color(Display.getDefault(), 255, 255, 255);
+		Color c = new Color(Display.getDefault(), 200, 200, 0);
+		return c;
 	}
 
 	@Override
 	public Color getHighlightColor(PackageInfo info) {
-		return new Color(Display.getDefault(), 0, 0, 200);
+		Color c = new Color(Display.getDefault(), 200, 0, 0);
+		return c;
 	}
 
 	@Override
 	public Color getBorderColor(PackageInfo info) {
-		return new Color(Display.getDefault(), 0, 0, 0);
+		Color c = new Color(Display.getDefault(), 200, 0, 0);
+		return c;
 	}
 
 	@Override
 	public Color getBorderHighlightColor(PackageInfo info) {
-		return new Color(Display.getDefault(), 0, 0, 0);
+		Color c = new Color(Display.getDefault(), 0, 0, 0);
+		return c;
 	}
 
 	@Override
 	public PackageSize getSize(PackageInfo info) {
-		PackageSize size = new PackageSize(100,50);
-		return size;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public Font getTextFont(PackageInfo info) {
-		// TODO Auto-generated method stub
-		return null;
+		Font f = new Font(Display.getCurrent(), "style", 8, 0);
+		return f;
 	}
 
 	@Override
 	public Color getBackgroundColor(PackageInfo info) {
-		// TODO Auto-generated method stub
-		return null;
+		Color c = new Color(Display.getDefault(), 0, 0, 0);
+		return c;
 	}
 
 	@Override
 	public Image getIcon(PackageInfo info) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
