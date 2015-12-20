@@ -14,21 +14,20 @@ import pa.iscde.packdep.info.PackageSize;
 
 /**
  * 
- * @author packdepCreators
  *
  *This interface is for the extensions that want to personalize the view.
- *This includes:
+ *This includes:<br>
  *-color, highlight color, size, border color, highlight border color, 
- *text color and icon for each node (package).
- *-background color.
- *
+ *text color and icon for each node (package).<br>
+ *-background color.<br>
+ *<br>
  *the init function receives a GlobalInfo object that contains information regarding the workspace.
  *All the other functions receive information about a single package.
- *
+ *<br><br>
  *When implementing this interface, all methods can return null. 
  *If a method returns null, a default value is used instead, so whoever implements this doesn't 
  *need to worry about methods that he/she is not interested.
- *
+ *<br><br>
  *ATTENTION: the icon method needs special attention. If the user does not return a valid argument,
  *the view may not open and may raise an exception. If the user does not know what to return, 
  *it is recommended that returns null.
