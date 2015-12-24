@@ -39,7 +39,7 @@ public interface packdepStyle {
 		 * This is called first. Use this method to store the information about the 
 		 * workspace and then use that information on the rest of the methods.
 		 * 
-		 * @param gInfo information about the workspace.
+		 * @param gInfo information about the workspace. (not-null)
 		 * It has the total number of the packages, classes and dependencies.
 		 */
 	    void init(GlobalInfo gInfo);
@@ -49,7 +49,7 @@ public interface packdepStyle {
 	     * Get the color that the node (package) will have.<br>
 	     * Example: return new Color(Display.getDefault(), 255, 255, 255);
 	     * 
-	     * @param info package information.
+	     * @param info package information. (not-null)
 	     * It contains the packageElement, name, number of classes, number of dependencies, 
 	     * number of lines and the packages that depends on.
 	     * @return color of the package
@@ -61,7 +61,7 @@ public interface packdepStyle {
 	     * Get the color of the name of the package.<br>
 	     * Example: return new Color(Display.getDefault(), 255, 255, 255);
 	     * 
-	     * @param info package information.
+	     * @param info package information. (not-null)
 	     * It contains the packageElement, name, number of classes, number of dependencies, 
 	     * number of lines and the packages that depends on.
 	     * @return color of the name of the package
@@ -73,7 +73,7 @@ public interface packdepStyle {
 	     * Get the color that the node (package) will have when highlighted (e.g. selected).<br>
 	     * Example: return new Color(Display.getDefault(), 255, 255, 255);
 	     * 
-	     * @param info package information.
+	     * @param info package information. (not-null)
 	     * It contains the packageElement, name, number of classes, number of dependencies, 
 	     * number of lines and the packages that depends on.
 	     * @return color of the package when highlighted
@@ -85,7 +85,7 @@ public interface packdepStyle {
 	     * Get the border color of the nodes (packages).<br>
 	     * Example: return new Color(Display.getDefault(), 255, 255, 255);
 	     * 
-	     * @param info package information.
+	     * @param info package information. (not-null)
 	     * It contains the packageElement, name, number of classes, number of dependencies, 
 	     * number of lines and the packages that depends on.
 	     * @return border color
@@ -97,7 +97,7 @@ public interface packdepStyle {
 	     * Get the border color of the nodes (packages) when highlighted (e.g. selected).<br>
 	     * Example: return new Color(Display.getDefault(), 255, 255, 255);
 	     * 
-	     * @param info package information.
+	     * @param info package information. (not-null)
 	     * It contains the packageElement, name, number of classes, number of dependencies, 
 	     * number of lines and the packages that depends on.
 	     * @return border color when highlighted.
@@ -109,7 +109,7 @@ public interface packdepStyle {
 	     * Get node (package) size.<br>
 	     * Example: return new PackageSize(100,50);
 	     * 
-	     * @param info package information.
+	     * @param info package information. (not-null)
 	     * It contains the packageElement, name, number of classes, number of dependencies, 
 	     * number of lines and the packages that depends on.
 	     * @return size of the node (package).
@@ -121,7 +121,7 @@ public interface packdepStyle {
 	     * Get text font that appears on the node (package).<br>
 	     * Example: new PackageSize(100,50);
 	     * 
-	     * @param info package information.
+	     * @param info package information. (not-null)
 	     * It contains the packageElement, name, number of classes, number of dependencies, 
 	     * number of lines and the packages that depends on.
 	     * @return node's text font.
@@ -134,7 +134,7 @@ public interface packdepStyle {
 	     * Get background color.<br>
 	     * Example: return new Color(Display.getDefault(), 255, 255, 255);
 	     * 
-	     * @param info package information.
+	     * @param info package information. (not-null)
 	     * It contains the packageElement, name, number of classes, number of dependencies, 
 	     * number of lines and the packages that depends on.
 	     * @return background color.
@@ -146,7 +146,7 @@ public interface packdepStyle {
 	     * Get icon shown on the node (package).<br>
 	     * Be carefull! Returning a non valid image may raise an exception!
 	     * 
-	     * @param info package information.
+	     * @param info package information. (not-null)
 	     * It contains the packageElement, name, number of classes, number of dependencies, 
 	     * number of lines and the packages that depends on.
 	     * @return image.

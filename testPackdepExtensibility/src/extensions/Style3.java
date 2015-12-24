@@ -21,8 +21,8 @@ public class Style3 implements packdepStyle {
 	@Override
 	public Color getColor(PackageInfo info) {
 		Color c;
-		System.out.println(info.getnDependencies() + " " + info.getName());
-		if(info.getnDependencies()<=0){
+		System.out.println(info.getNumberOfDependencies() + " " + info.getName());
+		if(info.getNumberOfDependencies()<=0){
 			c = new Color(Display.getDefault(), 0, 0, 200);
 		}
 		else{

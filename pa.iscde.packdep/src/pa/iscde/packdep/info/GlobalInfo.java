@@ -1,32 +1,51 @@
 package pa.iscde.packdep.info;
 
-//global workspace information
+/**
+ * 
+ * global workspace information
+ *
+ */
 public class GlobalInfo {
 	
-	//number of packages
-	int nPackages;
-	//number of dependencies
-	int nDependencies;
-	//number of classes
-	int nClasses;
+	/**
+	 * number of packages on the workspace
+	 */
+	int numberOfPackages;
+	/**
+	 * number of dependencies on the workspace
+	 */
+	int numberOfDependencies;
+	/**
+	 * number of classes on the workspace
+	 */
+	int numberOfClasses;
 	
 	//constructor.
-	public GlobalInfo(int nPackages, int nDependencies, int nClasses) {
-		this.nPackages = nPackages;
-		this.nDependencies = nDependencies;
-		this.nClasses = nClasses;
+	public GlobalInfo(int numberOfPackages, int numberOfDependencies, int numbeOfClasses) {
+		this.numberOfPackages = numberOfPackages;
+		this.numberOfDependencies = numberOfDependencies;
+		this.numberOfClasses = numbeOfClasses;
 	}
 
-	public int getnPackages() {
-		return nPackages;
+	/**
+	 * number of packages on the workspace
+	 */
+	public int getNumberOfPackages() {
+		return numberOfPackages;
 	}
 
-	public int getnDependencies() {
-		return nDependencies;
+	/**
+	 * number of dependencies on the workspace
+	 */
+	public int getNumberOfDependencies() {
+		return numberOfDependencies;
 	}
 
-	public int getnClasses() {
-		return nClasses;
+	/**
+	 * number of classes on the workspace
+	 */
+	public int getNumberOfClasses() {
+		return numberOfClasses;
 	}
 
 }

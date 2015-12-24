@@ -17,15 +17,15 @@ public class Style1 implements packdepStyle{
 	
 	@Override
 	public void init(GlobalInfo gInfo) {
-		nClasses = gInfo.getnClasses();
+		nClasses = gInfo.getNumberOfClasses();
 	}
 
 	@Override
 	public Color getColor(PackageInfo info) {
-		if(info.getnClass()==0){
+		if(info.getNumberOfClass()==0){
 			return new Color(Display.getDefault(), 200, 0, 0);
 		}
-		else if(info.getnClass()==1){
+		else if(info.getNumberOfClass()==1){
 			return new Color(Display.getDefault(), 200, 200, 0);
 		}
 		else{

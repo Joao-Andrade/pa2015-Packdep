@@ -53,14 +53,14 @@ It is possible to personalise the color, size, icon and font of each package (no
          <attribute name="name" type="string">
             <annotation>
                <documentation>
-                  
+                  name of the style. It will show this name on the style selector.
                </documentation>
             </annotation>
          </attribute>
          <attribute name="class" type="string">
             <annotation>
                <documentation>
-                  
+                  Class java that will implement the interface.
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":pa.iscde.packdep.extensions.packdepStyle"/>
