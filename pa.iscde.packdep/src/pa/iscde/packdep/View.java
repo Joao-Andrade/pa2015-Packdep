@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
@@ -54,7 +55,11 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
 
+import extensionpoints.ISearchEvent;
+import extensionpoints.ISearchEventListener;
+import extensionpoints.Item;
 import pa.iscde.packdep.extensions.packdepStyle;
+import pa.iscde.packdep.extensions.DeepSearchService;
 import pa.iscde.packdep.extensions.packdepAction;
 import pa.iscde.packdep.info.GlobalInfo;
 import pa.iscde.packdep.info.PackageInfo;
@@ -74,6 +79,7 @@ public class View implements PidescoView {
 	//services
 	JavaEditorServices editorService;
 	ProjectBrowserServices projectService;
+	ISearchEvent searchService;
 	
 	//all packages
 	ArrayList<PackageElement> packages;
@@ -87,6 +93,9 @@ public class View implements PidescoView {
 	
 	//Graph Nodes
 	ArrayList<GraphNode> nodes;
+	
+	//map between packageElements and GraphNodes. This is used to which package corresponds eack node.
+	Map<PackageElement, GraphNode> graphNodes;
 	
 	//array with all Packages information
 	ArrayList<PackageInfo> pInfo;
@@ -108,6 +117,7 @@ public class View implements PidescoView {
 		// services
 		editorService = Activator.getEditorService();
 		projectService = Activator.getProjectService();
+		searchService = Activator.getSearchService();
 		
 		//get packages informations
 		pInfo = getPackages();
@@ -120,6 +130,9 @@ public class View implements PidescoView {
 
 		//set the menu to change the style
 		StyleSelector.init(g, nodes, styles);
+		
+		//deepsearch event
+		new DeepSearchService(g, graphNodes);
 		
 	}
 	
@@ -273,7 +286,8 @@ public class View implements PidescoView {
 		g.setConnectionStyle(ZestStyles.CONNECTIONS_DIRECTED);
 		
 		//map between packageElements and GraphNodes. This is used to which package corresponds eack node.
-		Map<PackageElement, GraphNode> graphNodes = new HashMap<PackageElement, GraphNode>();
+		graphNodes = new HashMap<PackageElement, GraphNode>();
+		
 		//all the nodes
 		nodes = new ArrayList<GraphNode>();
 		
@@ -378,7 +392,6 @@ public class View implements PidescoView {
 		//item 1
 	    final MenuItem subMenuAction = new MenuItem(menu, SWT.CASCADE);
 	    subMenuAction.setText("Action");
-
 	    //listener to when a node is pressed with mouse
 	    g.addSelectionListener(new SelectionAdapter() {
 	  	      public void widgetSelected(SelectionEvent e) {
