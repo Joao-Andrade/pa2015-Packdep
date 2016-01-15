@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="packdepStyleCreator" name="packdepStyleCreator" schema="schema/packdepStyleCreator.exsd"/>
+   <extension-point id="packdepActionPoint" name="packdepActionPoint" schema="schema/packdepActionPoint.exsd"/>
+   <extension
+         id="packDep"
+         name="Package Dependencies"
+         point="pt.iscte.pidesco.view">
+      <view
+            class="pa.iscde.packdep.View">
+      </view>
+   </extension>
+   <extension
+         id="id3"
+         name="style_selector"
+         point="pt.iscte.pidesco.tool">
+      <tool
+            class="pa.iscde.packdep.StyleSelector"
+            description="change style (color scheme) - Create a extension for the packdepstyle and your style shall appear here!"
+            hasState="false"
+            icon="styles_icon.jpg"
+            view="pa.iscde.packdep.packDep">
+      </tool>
+   </extension>
+   <extension
+         point="pt.iscte.pidesco.classdiagram.PopupAction">
+      <PopupAction
+            Action_Text="Highlight_Action"
+            action="pa.iscde.packdep.extensions.ClassDiagramAction">
+      </PopupAction>
+   </extension>
+
+</plugin>
